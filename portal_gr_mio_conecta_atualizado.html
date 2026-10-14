@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Grêmio Conecta</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-zinc-950 min-h-screen text-zinc-100 antialiased selection:bg-red-600 selection:text-white">
+
+    <div id="app" class="min-h-screen flex flex-col">
+        
+        <!-- LOGIN SCREEN -->
+        <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-zinc-950 via-zinc-900 to-red-950">
+            <div class="max-w-md w-full bg-zinc-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 space-y-6 relative overflow-hidden border border-red-900/40">
+                <div class="space-y-2 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-600/10 text-red-500 mb-2 border border-red-500/20 shadow-inner">
+                        <i data-lucide="shield-alert" class="w-8 h-8"></i>
+                    </div>
+                    <h1 class="text-2xl font-black tracking-tight text-white uppercase">Grêmio Conecta</h1>
+                    <p class="text-xs text-zinc-400">Portal do Estudante • Acesso Autenticado</p>
+                </div>
+
+                <form id="form-login" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Usuário / Login *</label>
+                        <input type="text" id="login-username" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Digite seu usuário">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Senha *</label>
+                        <div class="relative">
+                            <input type="password" id="login-password" required class="w-full px-4 py-3 pr-12 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Digite sua senha">
+                            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1 transition" title="Ver/Ocultar Senha">
+                                <i id="toggle-password-icon" data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-4 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 transition duration-200 flex items-center justify-center gap-2 uppercase tracking-wide text-xs">
+                        <span>Entrar no Portal</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+                
+                <div class="pt-2 text-center">
+                    <p class="text-[11px] text-zinc-500">Insira suas credenciais cadastradas pelo administrador</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD SCREEN -->
+        <div id="dashboard-screen" class="hidden min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+            
+            <header class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-30 shadow-md">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center font-black shadow-lg shadow-red-600/30">
+                            GC
+                        </div>
+                        <div>
+                            <span class="font-bold text-white text-lg block leading-none tracking-wide">GRÊMIO CONECTA</span>
+                            <span class="text-[10px] text-red-500 font-semibold tracking-wider uppercase">Sistema Local Instantâneo</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <button id="btn-notifications" onclick="showUserMessagesModal()" class="relative p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition" title="Avisos e Mensagens">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span id="unread-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full animate-pulse"></span>
+                        </button>
+
+                        <div class="text-right hidden sm:block">
+                            <span id="user-display-name" class="font-semibold text-sm block text-zinc-100"></span>
+                            <span id="user-role-badge" class="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-red-950/80 text-red-400 border border-red-800/60 uppercase"></span>
+                        </div>
+                        <button id="btn-logout" class="p-2 rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-950/30 transition" title="Sair">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+                
+                <!-- BANNER DE BOAS-VINDAS -->
+                <div class="bg-gradient-to-r from-red-900 via-zinc-900 to-black rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden border border-red-900/30">
+                    <div class="relative z-10 space-y-2">
+                        <span id="user-tag-header" class="px-3 py-1 bg-red-600/30 border border-red-500/30 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider text-red-300">Painel Sincronizado Localmente</span>
+                        <h2 id="welcome-message" class="text-xl sm:text-3xl font-black tracking-tight"></h2>
+                        <p id="welcome-subtext" class="text-zinc-400 text-sm sm:text-base max-w-2xl"></p>
+                    </div>
+                    <div class="absolute right-[-20px] bottom-[-20px] opacity-10 text-red-500 pointer-events-none">
+                        <i data-lucide="shield" class="w-64 h-64"></i>
+                    </div>
+                </div>
+
+                <!-- NAVIGATION TABS CONTAINER -->
+                <div id="tabs-navigation" class="flex border-b border-zinc-800 overflow-x-auto no-scrollbar gap-2 sm:gap-3 pb-2">
+                    <!-- Tabs build dynamically per user role -->
+                </div>
+
+                <!-- ================= TAB CONTENTS ================= -->
+
+                <!-- TAB: PAINEL ADM (EXCLUSIVO PARA ADM) -->
+                <div id="tab-painel-adm" class="tab-content hidden space-y-6">
+                    
+                    <!-- ADM COUNTERS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-red-950/50 text-red-400 rounded-xl border border-red-900/50">
+                                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-zinc-400 font-semibold uppercase">Total Pendências</span>
+                                <h4 id="count-pending-total" class="text-2xl font-bold text-white">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-zinc-800 text-red-400 rounded-xl border border-zinc-700">
+                                <i data-lucide="user-check" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-zinc-400 font-semibold uppercase">Indicações Comissão</span>
+                                <h4 id="count-pending-indica" class="text-2xl font-bold text-white">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-zinc-800 text-red-400 rounded-xl border border-zinc-700">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-zinc-400 font-semibold uppercase">Pedidos Direção</span>
+                                <h4 id="count-pending-direcao" class="text-2xl font-bold text-white">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-red-600/20 text-red-500 rounded-xl border border-red-500/30">
+                                <i data-lucide="users" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-zinc-400 font-semibold uppercase">Usuários Ativos</span>
+                                <h4 id="count-total-users" class="text-2xl font-bold text-white">0</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CENTRAL DE PENDÊNCIAS -->
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-6">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="clock" class="w-5 h-5 text-red-500"></i>
+                            Central de Pendências para Aprovação / Gestão
+                        </h3>
+
+                        <!-- SUB-TABS PENDENCIAS -->
+                        <div class="flex border-b border-zinc-800 gap-4 text-sm font-semibold text-zinc-400">
+                            <button onclick="switchAdmSubtab('indicacoes')" id="subtab-btn-indicacoes" class="pb-2 border-b-2 border-red-600 text-red-500 font-bold">
+                                Indicações Comissão (<span id="badge-count-indica">0</span>)
+                            </button>
+                            <button onclick="switchAdmSubtab('projetos')" id="subtab-btn-projetos" class="pb-2 border-b-2 border-transparent hover:text-zinc-200">
+                                Projetos Recebidos (<span id="badge-count-proj">0</span>)
+                            </button>
+                            <button onclick="switchAdmSubtab('direcao')" id="subtab-btn-direcao" class="pb-2 border-b-2 border-transparent hover:text-zinc-200">
+                                Pedidos da Direção (<span id="badge-count-direcao">0</span>)
+                            </button>
+                        </div>
+
+                        <!-- LISTA INDICAÇÕES DA COMISSÃO -->
+                        <div id="adm-subtab-indicacoes" class="space-y-4"></div>
+
+                        <!-- LISTA PROJETOS ENVIADOS -->
+                        <div id="adm-subtab-projetos" class="hidden space-y-4"></div>
+
+                        <!-- LISTA PEDIDOS DA DIREÇÃO -->
+                        <div id="adm-subtab-direcao" class="hidden space-y-4"></div>
+                    </div>
+
+                    <!-- GERENCIAR VOTAÇÃO ELETRÔNICA (NOVO PAINEL ADM) -->
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-red-900/40 p-6 space-y-6">
+                        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="vote" class="w-5 h-5 text-red-500"></i>
+                                    Painel Eletrônico - Colocar Projetos em Pauta
+                                </h3>
+                                <p class="text-zinc-400 text-sm">Selecione um projeto enviado para iniciar a votação eletrônica dos gremistas.</p>
+                            </div>
+                            <div id="voting-status-indicator"></div>
+                        </div>
+
+                        <!-- SELECIONAR PROJETO PARA PAUTA -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Escolher Projeto Submetido *</label>
+                                <select id="select-project-pauta" class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                    <option value="">Selecione um projeto para colocar em pauta...</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="iniciarVotacaoPauta()" class="flex-1 py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2 uppercase tracking-wide">
+                                    <i data-lucide="play-circle" class="w-4 h-4"></i>
+                                    <span>Colocar em Pauta</span>
+                                </button>
+                                <button onclick="encerrarVotacaoPauta()" class="py-3 px-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-xl border border-zinc-700 transition flex items-center justify-center gap-2 uppercase tracking-wide" title="Encerrar Votação e Computar Faltas">
+                                    <i data-lucide="stop-circle" class="w-4 h-4 text-red-400"></i>
+                                    <span>Encerrar</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- RESULTADOS EM TEMPO REAL DA PAUTA ATUAL -->
+                        <div id="adm-active-voting-results" class="bg-zinc-950 rounded-2xl p-5 border border-zinc-800 space-y-4">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Status da Votação Ativa</h4>
+                            <div id="adm-pauta-content" class="text-sm text-zinc-300">Nenhuma votação em andamento no momento.</div>
+                        </div>
+                    </div>
+
+                    <!-- ENVIAR MENSAGEM / BROADCAST -->
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="megaphone" class="w-5 h-5 text-red-500"></i>
+                            Painel de Envio de Mensagens e Avisos Globais
+                        </h3>
+                        <p class="text-zinc-400 text-sm">A mensagem enviada aqui aparecerá instantaneamente para os usuários conectados.</p>
+
+                        <form id="form-send-msg" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Destinatário *</label>
+                                    <select id="msg-target" class="w-full px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                        <option value="ALL">Todos os Usuários</option>
+                                        <option value="GREMISTA">Todos os Gremistas</option>
+                                        <option value="COMISSAO">Toda a Comissão</option>
+                                        <option value="DIRECAO">Direção Escolar</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Título do Aviso *</label>
+                                    <input type="text" id="msg-title" required class="w-full px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Reunião Geral Extraordinária">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Conteúdo da Mensagem *</label>
+                                <textarea id="msg-body" rows="3" required class="w-full px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Digite o aviso urgente ou informativo..."></textarea>
+                            </div>
+
+                            <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow transition flex items-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                <span>Enviar Aviso Importante</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- CADASTRAR NOVO USUÁRIO -->
+                        <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-red-500"></i>
+                                Cadastrar Novo Usuário
+                            </h3>
+
+                            <form id="form-add-user" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Nome Completo *</label>
+                                    <input type="text" id="new-user-name" required class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Lucas Silva">
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Login / Usuário *</label>
+                                        <input type="text" id="new-user-login" required class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="lucassilva">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Senha *</label>
+                                        <input type="text" id="new-user-password" required class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="123456">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Tipo de Cargo *</label>
+                                        <select id="new-user-role-type" onchange="toggleCoordenadorSelect()" class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                            <option value="GREMISTA">Gremista</option>
+                                            <option value="COORDENADOR">Coordenador Gremista</option>
+                                            <option value="COMISSAO">Comissão</option>
+                                            <option value="DIRECAO">Direção Escolar</option>
+                                            <option value="ADM">ADM (Administrador)</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="box-select-coordenador" class="hidden">
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Indicado por *</label>
+                                        <select id="new-user-coordinator" class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"></select>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="btn-submit-user" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-600/30 transition flex items-center justify-center gap-2 uppercase tracking-wide">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Cadastrar Usuário Agora</span>
+                                </button>
+                            </form>
+
+                            <!-- USER LIST -->
+                            <div class="pt-4 border-t border-zinc-800">
+                                <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Usuários Registrados</h4>
+                                <div id="users-list-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                            </div>
+                        </div>
+
+                        <!-- PUBLICAR EVENTO NO CALENDÁRIO 2027 -->
+                        <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="calendar-plus" class="w-5 h-5 text-red-500"></i>
+                                Publicar Data no Calendário (2027)
+                            </h3>
+
+                            <form id="form-add-event" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Título do Evento *</label>
+                                    <input type="text" id="event-title" required class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Feira de Ideias 2027">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Data (2027) *</label>
+                                        <input type="date" id="event-date" required min="2027-01-01" max="2027-12-31" value="2027-01-01" class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Tipo de Data</label>
+                                        <select id="event-type" class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                            <option value="projeto">Projeto do Grêmio</option>
+                                            <option value="prova">Provas / Avaliações</option>
+                                            <option value="feriado">Feriado / Recesso</option>
+                                            <option value="reuniao">Reunião Geral</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Observações</label>
+                                    <textarea id="event-desc" rows="2" class="w-full px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Instruções adicionais..."></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm rounded-xl border border-zinc-700 transition flex items-center justify-center gap-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    <span>Salvar Evento Global</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: PAINEL ELETRÔNICO (VOTAÇÃO PARA GREMISTAS) -->
+                <div id="tab-painel-eletronico" class="tab-content hidden space-y-6">
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-6">
+                        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="vote" class="w-6 h-6 text-red-500"></i>
+                                    Painel Eletrônico de Votação
+                                </h3>
+                                <p class="text-sm text-zinc-400">Vote nos projetos colocados em pauta pela administração do Grêmio.</p>
+                            </div>
+                            <div id="voter-badge-status" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"></div>
+                        </div>
+
+                        <!-- PAUTA ATIVA PARA VOTAÇÃO -->
+                        <div id="active-voting-container" class="space-y-6">
+                            <div class="p-8 rounded-2xl bg-zinc-950 border border-zinc-800 text-center space-y-3">
+                                <i data-lucide="clock" class="w-12 h-12 text-zinc-600 mx-auto"></i>
+                                <h4 class="text-lg font-bold text-white">Nenhum Projeto em Pauta no Momento</h4>
+                                <p class="text-sm text-zinc-400 max-w-md mx-auto">Aguarde o administrador colocar um projeto em votação eletrônica.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HISTÓRICO DE VOTAÇÕES E PLACAR -->
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                        <h4 class="text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-red-500"></i>
+                            Histórico de Votações & Resultados
+                        </h4>
+                        <div id="voting-history-container" class="space-y-4"></div>
+                    </div>
+                </div>
+
+                <!-- TAB: PAINEL DA DIREÇÃO -->
+                <div id="tab-painel-direcao" class="tab-content hidden space-y-6">
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="building-2" class="w-6 h-6 text-red-500"></i>
+                            Painel de Controle da Direção Escolar
+                        </h3>
+                        <p class="text-sm text-zinc-400">Supervisione o Grêmio Estudantil, Comissão, Projetos e envie solicitações oficiais.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                            <h4 class="text-base font-bold text-white flex items-center gap-2">
+                                <i data-lucide="send" class="w-5 h-5 text-red-500"></i>
+                                Enviar Pedido / Mensagem à Liderança & ADM
+                            </h4>
+
+                            <form id="form-pedidos-direcao" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Título da Solicitação *</label>
+                                    <input type="text" id="pedido-titulo" required class="w-full px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Solicitação de Apoio na Feira Cultural">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Destinatário Principal</label>
+                                    <select id="pedido-destinatario" class="w-full px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                        <option value="ADM">Administração do Grêmio (ADM)</option>
+                                        <option value="GREMIO">Toda a Liderança Gremista</option>
+                                        <option value="COMISSAO">Membros da Comissão</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Detalhamento do Pedido *</label>
+                                    <textarea id="pedido-descricao" rows="4" required class="w-full px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Descreva o pedido, diretrizes ou demanda da direção..."></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-600/30 transition flex items-center justify-center gap-2 uppercase tracking-wide">
+                                    <i data-lucide="send" class="w-4 h-4"></i>
+                                    <span>Enviar Pedido Oficial</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                            <h4 class="text-base font-bold text-white flex items-center gap-2">
+                                <i data-lucide="history" class="w-5 h-5 text-red-500"></i>
+                                Histórico de Pedidos Enviados pela Direção
+                            </h4>
+                            <div id="direcao-pedidos-list" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENVIO DE PROJETOS -->
+                <div id="tab-envio-projetos" class="tab-content hidden space-y-6">
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="send" class="w-5 h-5 text-red-500"></i>
+                                Enviar ou Digitar Novo Projeto / Proposta
+                            </h3>
+                            <p class="text-zinc-400 text-sm">A proposta será submetida diretamente para análise da administração.</p>
+                        </div>
+
+                        <form id="form-submit-project" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Título do Projeto *</label>
+                                <input type="text" id="project-title" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Gincana Cultural 2027">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Categoria</label>
+                                    <select id="project-category" class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                        <option value="Esporte">Esporte & Lazer</option>
+                                        <option value="Cultura">Cultura & Arte</option>
+                                        <option value="Estudos">Estudos & Acadêmico</option>
+                                        <option value="Social">Ação Social / Meio Ambiente</option>
+                                        <option value="Infraestrutura">Infraestrutura Escolar</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Previsão / Data Proposta (2027)</label>
+                                    <input type="date" id="project-target-date" min="2027-01-01" max="2027-12-31" class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Descrição / Objetivos *</label>
+                                <textarea id="project-description" rows="4" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Detalhe as ações, cronograma básico e benefícios..."></textarea>
+                            </div>
+
+                            <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-2 uppercase tracking-wide">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                <span>Enviar Projeto para Administração</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- PROJETOS ATRIBUÍDOS -->
+                <div id="tab-projetos-atribuidos" class="tab-content hidden space-y-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Projetos sob sua Responsabilidade / Atribuição</h3>
+                        <p class="text-sm text-zinc-400">Projetos em que você é responsável ou designado para colaborar.</p>
+                    </div>
+
+                    <div id="assigned-projects-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+
+                <!-- VISUALIZAR TODOS OS PROJETOS DA ESCOLA -->
+                <div id="tab-todos-projetos" class="tab-content hidden space-y-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Todos os Projetos do Grêmio (2027)</h3>
+                        <p class="text-sm text-zinc-400">Acompanhe o andamento geral das iniciativas escolares.</p>
+                    </div>
+
+                    <div id="all-projects-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+
+                <!-- CALENDÁRIO 2027 -->
+                <div id="tab-calendario" class="tab-content hidden space-y-6">
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-6 h-6 text-red-500"></i>
+                                Calendário de Eventos & Datas Importantes (2027)
+                            </h3>
+                            <p class="text-sm text-zinc-400">Provas, feriados, reuniões e eventos publicados pela Administração.</p>
+                        </div>
+
+                        <div class="flex gap-2 border-b border-zinc-800 pb-3 overflow-x-auto">
+                            <button onclick="filterCalendar('all', this)" class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-950/60 text-red-400 border border-red-800" data-filter="all">Todos</button>
+                            <button onclick="filterCalendar('projeto', this)" class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-300 hover:bg-zinc-700" data-filter="projeto">Projetos</button>
+                            <button onclick="filterCalendar('prova', this)" class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-300 hover:bg-zinc-700" data-filter="prova">Provas & Avaliações</button>
+                            <button onclick="filterCalendar('feriado', this)" class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-300 hover:bg-zinc-700" data-filter="feriado">Feriados / Recesso</button>
+                            <button onclick="filterCalendar('reuniao', this)" class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-300 hover:bg-zinc-700" data-filter="reuniao">Reuniões</button>
+                        </div>
+
+                        <div id="events-timeline" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <!-- INDICAR COMISSÃO -->
+                <div id="tab-indicar-comissao" class="tab-content hidden space-y-6">
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-red-500"></i>
+                                Indicar Membro para Comissão
+                            </h3>
+                            <p class="text-sm text-zinc-400">Preencha os dados do estudante. Todas as indicações passam por aprovação do ADM.</p>
+                        </div>
+
+                        <form id="form-indicar-comissao" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Nome Completo *</label>
+                                    <input type="text" id="nom-comissao" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Lucas Mendes">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Sala / Turma *</label>
+                                    <input type="text" id="sala-comissao" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: 2º Ano B">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Período *</label>
+                                    <select id="periodo-comissao" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm">
+                                        <option value="Manhã">Manhã</option>
+                                        <option value="Tarde">Tarde</option>
+                                        <option value="Noite">Noite</option>
+                                        <option value="Integral">Integral</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Motivo da Indicação *</label>
+                                    <input type="text" id="motivo-comissao" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Excelente liderança e organização">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-2 uppercase tracking-wide">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                                <span>Submeter Indicação ao ADM</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ENVIO DE TRABALHO -->
+                <div id="tab-envio-trabalho" class="tab-content hidden space-y-6">
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="upload-cloud" class="w-5 h-5 text-red-500"></i>
+                                Envio de Trabalho / Comprovantes
+                            </h3>
+                            <p class="text-sm text-zinc-400">Envie prints, fotos de cadernos e tarefas solicitadas pela administração.</p>
+                        </div>
+
+                        <form id="form-envio-trabalho" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Título / Identificação do Trabalho *</label>
+                                <input type="text" id="trabalho-titulo" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Ex: Fotos das Atividades de História">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Anexo / Imagem / Link do Drive *</label>
+                                <input type="text" id="trabalho-link" required class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Cole o link da foto/print ou insira a descrição completa">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Observações Gerais</label>
+                                <textarea id="trabalho-obs" rows="3" class="w-full px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-600 text-sm" placeholder="Anotações adicionais para o ADM..."></textarea>
+                            </div>
+
+                            <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-2 uppercase tracking-wide">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                                <span>Enviar Comprovante</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SUA COMISSÃO -->
+                <div id="tab-sua-comissao" class="tab-content hidden space-y-6">
+                    <div class="bg-zinc-900 rounded-2xl shadow-sm border border-zinc-800 p-6 space-y-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="users" class="w-5 h-5 text-red-500"></i>
+                            Integrantes Oficiais da Comissão
+                        </h3>
+                        <div id="lista-membros-comissao" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL MENSAGENS -->
+    <div id="modal-messages" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="max-w-lg w-full bg-zinc-900 rounded-3xl shadow-2xl p-6 space-y-4 relative border border-zinc-800">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <div class="flex items-center gap-2 text-red-500 font-bold">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span>Mensagens e Avisos</span>
+                </div>
+                <button onclick="closeUserMessagesModal()" class="text-zinc-500 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="modal-messages-body" class="space-y-3 max-h-80 overflow-y-auto pr-1 text-sm text-zinc-300"></div>
+
+            <button onclick="closeUserMessagesModal()" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm rounded-xl transition">
+                Ciente / Fechar
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-zinc-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-medium border border-red-900/50">
+        <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5 text-red-500"></i>
+        <span id="toast-message">Ação concluída!</span>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let activeCalendarFilter = 'all';
+        let activeAdmSubtab = 'indicacoes';
+
+        const DEFAULT_ADM = {
+            id: 'u_adm_miguel',
+            username: 'Miguel',
+            password: '09281226',
+            name: 'Miguel',
+            roleType: 'ADM',
+            roleName: 'Administrador Geral',
+            indicatedBy: null
+        };
+
+        // Carregamento inicial do localStorage ou dados padrão
+        let users = JSON.parse(localStorage.getItem('gremio_users')) || [DEFAULT_ADM];
+        let events = JSON.parse(localStorage.getItem('gremio_events')) || [
+            { id: 'e_1', title: 'Abertura do Ano Letivo 2027', date: '2027-02-01', type: 'reuniao', desc: 'Boas-vindas para todas as turmas.' }
+        ];
+        let projects = JSON.parse(localStorage.getItem('gremio_projects')) || [];
+        let indicacoesComissao = JSON.parse(localStorage.getItem('gremio_indicacoes')) || [];
+        let trabalhosEnviados = JSON.parse(localStorage.getItem('gremio_trabalhos')) || [];
+        let systemMessages = JSON.parse(localStorage.getItem('gremio_messages')) || [];
+        let pedidosDirecao = JSON.parse(localStorage.getItem('gremio_pedidos')) || [];
+        
+        // Votação Eletrônica Ativa e Histórico
+        let activeVoting = JSON.parse(localStorage.getItem('gremio_active_voting')) || null; // { projectId, status: 'OPEN'|'CLOSED', votes: { userId: 'SIM'|'NÃO'|'ABESTENÇÃO' }, faltas: [] }
+        let votingHistory = JSON.parse(localStorage.getItem('gremio_voting_history')) || [];
+
+        function persistAndRender() {
+            localStorage.setItem('gremio_users', JSON.stringify(users));
+            localStorage.setItem('gremio_events', JSON.stringify(events));
+            localStorage.setItem('gremio_projects', JSON.stringify(projects));
+            localStorage.setItem('gremio_indicacoes', JSON.stringify(indicacoesComissao));
+            localStorage.setItem('gremio_trabalhos', JSON.stringify(trabalhosEnviados));
+            localStorage.setItem('gremio_messages', JSON.stringify(systemMessages));
+            localStorage.setItem('gremio_pedidos', JSON.stringify(pedidosDirecao));
+            localStorage.setItem('gremio_active_voting', JSON.stringify(activeVoting));
+            localStorage.setItem('gremio_voting_history', JSON.stringify(votingHistory));
+
+            if (currentUser) {
+                renderAll();
+            }
+        }
+
+        // LOGIN COM CREDENCIAIS REAIS
+        document.getElementById('form-login').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('login-password').value.trim();
+
+            const foundUser = users.find(u => 
+                String(u.username).trim().toLowerCase() === usernameInput && 
+                String(u.password).trim() === passwordInput
+            );
+
+            if (foundUser) {
+                currentUser = foundUser;
+                document.getElementById('form-login').reset();
+                initDashboard();
+                showToast(`Bem-vindo(a), ${foundUser.name}!`);
+            } else {
+                showToast('Usuário ou senha incorretos!', false);
+            }
+        });
+
+        window.togglePasswordVisibility = function() {
+            const pwdInput = document.getElementById('login-password');
+            const icon = document.getElementById('toggle-password-icon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                pwdInput.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            currentUser = null;
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        });
+
+        function initDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-role-badge').innerText = currentUser.roleType;
+
+            const welcomeMsg = document.getElementById('welcome-message');
+            const welcomeSub = document.getElementById('welcome-subtext');
+
+            if (currentUser.roleType === 'COMISSAO') {
+                welcomeMsg.innerText = `OLÁ COMISSIONADA ${currentUser.name.toUpperCase()}`;
+                welcomeSub.innerText = `INDICADA POR: ${currentUser.indicatedBy ? currentUser.indicatedBy.toUpperCase() : 'LIDERANÇA'}`;
+            } else if (currentUser.roleType === 'DIRECAO') {
+                welcomeMsg.innerText = `BEM-VINDO(A) DIREÇÃO ${currentUser.name.toUpperCase()}`;
+                welcomeSub.innerText = `Painel Executivo de Acompanhamento Local Instantâneo.`;
+            } else {
+                welcomeMsg.innerText = `OLÁ ${currentUser.name.toUpperCase()} ESSE É O SEU PORTAL GRÊMIO CONECTA`;
+                welcomeSub.innerText = `Acompanhe seus projetos, eventos e participe das votações eletrônicas em tempo real.`;
+            }
+
+            setupTabs();
+            renderAll();
+            checkAndShowUserMessages();
+        }
+
+        function checkAndShowUserMessages() {
+            const userMsgs = getMessagesForUser();
+            const unread = userMsgs.filter(m => !m.readBy?.includes(currentUser.id));
+
+            const badge = document.getElementById('unread-badge');
+            if (unread.length > 0) {
+                badge.classList.remove('hidden');
+                showUserMessagesModal();
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function getMessagesForUser() {
+            return systemMessages.filter(m => 
+                m.target === 'ALL' || 
+                m.target === currentUser.roleType || 
+                m.target === currentUser.id
+            );
+        }
+
+        window.showUserMessagesModal = function() {
+            const userMsgs = getMessagesForUser();
+            const container = document.getElementById('modal-messages-body');
+
+            if (userMsgs.length === 0) {
+                container.innerHTML = `<p class="text-center py-6 text-zinc-500">Nenhum aviso no momento.</p>`;
+            } else {
+                container.innerHTML = userMsgs.map(m => `
+                    <div class="p-4 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-white text-sm">${m.title}</span>
+                            <span class="text-[10px] text-zinc-500">${m.date}</span>
+                        </div>
+                        <p class="text-xs text-zinc-400 leading-relaxed">${m.body}</p>
+                        <span class="text-[10px] text-red-500 font-semibold block pt-1">Enviado por ADM</span>
+                    </div>
+                `).join('');
+
+                userMsgs.forEach(m => {
+                    if (!m.readBy) m.readBy = [];
+                    if (!m.readBy.includes(currentUser.id)) {
+                        m.readBy.push(currentUser.id);
+                    }
+                });
+                persistAndRender();
+                document.getElementById('unread-badge').classList.add('hidden');
+            }
+
+            document.getElementById('modal-messages').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        window.closeUserMessagesModal = function() {
+            document.getElementById('modal-messages').classList.add('hidden');
+        }
+
+        function setupTabs() {
+            const tabsContainer = document.getElementById('tabs-navigation');
+            tabsContainer.innerHTML = '';
+
+            let tabButtonsHTML = '';
+
+            if (currentUser.roleType === 'ADM') {
+                tabButtonsHTML += `
+                    <button data-tab="painel-adm" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-red-600 text-white shadow-lg shadow-red-600/30">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Painel ADM</span>
+                    </button>
+                    <button data-tab="painel-eletronico" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="vote" class="w-4 h-4"></i>
+                        <span>Painel Eletrônico</span>
+                    </button>
+                    <button data-tab="envio-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Enviar Projetos</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                `;
+            } else if (currentUser.roleType === 'DIRECAO') {
+                tabButtonsHTML += `
+                    <button data-tab="painel-direcao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-red-600 text-white shadow-lg shadow-red-600/30">
+                        <i data-lucide="building-2" class="w-4 h-4"></i>
+                        <span>Painel Direção</span>
+                    </button>
+                    <button data-tab="painel-eletronico" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="vote" class="w-4 h-4"></i>
+                        <span>Painel Eletrônico</span>
+                    </button>
+                    <button data-tab="todos-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="folder" class="w-4 h-4"></i>
+                        <span>Projetos Grêmio</span>
+                    </button>
+                    <button data-tab="sua-comissao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span>Comissão</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                `;
+            } else if (currentUser.roleType === 'COMISSAO') {
+                tabButtonsHTML += `
+                    <button data-tab="painel-eletronico" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-red-600 text-white shadow-lg shadow-red-600/30">
+                        <i data-lucide="vote" class="w-4 h-4"></i>
+                        <span>Painel Eletrônico</span>
+                    </button>
+                    <button data-tab="projetos-atribuidos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="briefcase" class="w-4 h-4"></i>
+                        <span>Sua Atribuição</span>
+                    </button>
+                    <button data-tab="envio-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Envio de Propostas</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                `;
+            } else {
+                // GREMISTA
+                tabButtonsHTML += `
+                    <button data-tab="painel-eletronico" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-red-600 text-white shadow-lg shadow-red-600/30">
+                        <i data-lucide="vote" class="w-4 h-4"></i>
+                        <span>Painel Eletrônico</span>
+                    </button>
+                    <button data-tab="envio-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Envie Projetos</span>
+                    </button>
+                    <button data-tab="projetos-atribuidos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="briefcase" class="w-4 h-4"></i>
+                        <span>Projetos Atribuídos</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                    <button data-tab="indicar-comissao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>Indicar Comissão</span>
+                    </button>
+                    <button data-tab="envio-trabalho" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                        <span>Envio de Trabalho</span>
+                    </button>
+                    <button data-tab="sua-comissao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-zinc-400 hover:bg-zinc-900">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span>Sua Comissão</span>
+                    </button>
+                `;
+            }
+
+            tabsContainer.innerHTML = tabButtonsHTML;
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+                    switchTab(targetTab);
+                });
+            });
+
+            const defaultTab = currentUser.roleType === 'ADM' ? 'painel-adm' : 
+                               (currentUser.roleType === 'DIRECAO' ? 'painel-direcao' : 'painel-eletronico');
+            switchTab(defaultTab);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('bg-red-600', 'text-white', 'shadow-lg', 'shadow-red-600/30');
+                b.classList.add('text-zinc-400', 'hover:bg-zinc-900');
+            });
+
+            const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-red-600', 'text-white', 'shadow-lg', 'shadow-red-600/30');
+                activeBtn.classList.remove('text-zinc-400', 'hover:bg-zinc-900');
+            }
+
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            const targetContent = document.getElementById(`tab-${tabId}`);
+            if (targetContent) targetContent.classList.remove('hidden');
+
+            lucide.createIcons();
+        }
+
+        function renderAll() {
+            renderAssignedProjects();
+            renderAllProjects();
+            renderCalendar();
+            renderComissaoList();
+            renderDirecaoPanel();
+            renderElectronicVoting();
+            if (currentUser && currentUser.roleType === 'ADM') {
+                renderAdminPanel();
+            }
+            lucide.createIcons();
+        }
+
+        // FUNÇÕES DO PAINEL ELETRÔNICO E VOTAÇÃO
+        window.iniciarVotacaoPauta = function() {
+            const selectProj = document.getElementById('select-project-pauta');
+            const projId = selectProj.value;
+            if (!projId) {
+                showToast('Selecione um projeto válido para colocar em pauta!', false);
+                return;
+            }
+
+            const proj = projects.find(p => p.id === projId);
+            if (!proj) return;
+
+            activeVoting = {
+                projectId: proj.id,
+                projectTitle: proj.title,
+                projectCategory: proj.category,
+                projectDesc: proj.description,
+                author: proj.authorName,
+                status: 'OPEN',
+                votes: {}, // userId -> 'SIM' | 'NÃO' | 'ABESTENÇÃO'
+                faltas: []
+            };
+
+            persistAndRender();
+            showToast(`Projeto "${proj.title}" colocado em votação eletrônica!`);
+        }
+
+        window.encerrarVotacaoPauta = function() {
+            if (!activeVoting || activeVoting.status !== 'OPEN') {
+                showToast('Não há nenhuma votação em andamento para encerrar.', false);
+                return;
+            }
+
+            // Calcular faltas (usuários GREMISTAS ou COMISSAO que não votaram)
+            const eligibleVoters = users.filter(u => u.roleType === 'GREMISTA' || u.roleType === 'COMISSAO');
+            const faltas = [];
+
+            eligibleVoters.forEach(u => {
+                if (!activeVoting.votes[u.id]) {
+                    faltas.push({ id: u.id, name: u.name, role: u.roleType });
+                }
+            });
+
+            activeVoting.status = 'CLOSED';
+            activeVoting.faltas = faltas;
+
+            // Salvar no histórico
+            votingHistory.unshift(JSON.parse(JSON.stringify(activeVoting)));
+            
+            persistAndRender();
+            showToast('Votação encerrada pelo Presidente/ADM! Faltas computadas.');
+        }
+
+        window.votarProjeto = function(voto) {
+            if (!activeVoting || activeVoting.status !== 'OPEN') {
+                showToast('A votação não está ativa no momento.', false);
+                return;
+            }
+
+            activeVoting.votes[currentUser.id] = voto;
+            persistAndRender();
+            showToast(`Seu voto (${voto}) foi computado com sucesso!`);
+        }
+
+        function renderElectronicVoting() {
+            const container = document.getElementById('active-voting-container');
+            const voterBadge = document.getElementById('voter-badge-status');
+            const historyContainer = document.getElementById('voting-history-container');
+
+            if (!container) return;
+
+            // Renderizar status badge
+            if (activeVoting && activeVoting.status === 'OPEN') {
+                voterBadge.className = 'px-3 py-1 bg-emerald-950/80 text-emerald-400 border border-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider animate-pulse';
+                voterBadge.innerText = 'Votação Aberta';
+            } else {
+                voterBadge.className = 'px-3 py-1 bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full text-xs font-bold uppercase tracking-wider';
+                voterBadge.innerText = 'Votação Encerrada';
+            }
+
+            // Renderizar pauta ativa
+            if (!activeVoting || activeVoting.status === 'CLOSED') {
+                container.innerHTML = `
+                    <div class="p-8 rounded-2xl bg-zinc-950 border border-zinc-800 text-center space-y-3">
+                        <i data-lucide="check-circle-2" class="w-12 h-12 text-zinc-600 mx-auto"></i>
+                        <h4 class="text-lg font-bold text-white">Nenhum Projeto em Pauta no Momento</h4>
+                        <p class="text-sm text-zinc-400 max-w-md mx-auto">Aguarde o administrador colocar a próxima proposta em votação.</p>
+                    </div>
+                `;
+            } else {
+                const userVoto = activeVoting.votes[currentUser.id];
+                const totalSim = Object.values(activeVoting.votes).filter(v => v === 'SIM').length;
+                const totalNao = Object.values(activeVoting.votes).filter(v => v === 'NÃO').length;
+                const totalAbst = Object.values(activeVoting.votes).filter(v => v === 'ABESTENÇÃO').length;
+                const totalVotos = Object.keys(activeVoting.votes).length;
+
+                // Lista detalhada de gremistas que votaram
+                let votedListHTML = '';
+                const votedEntries = Object.entries(activeVoting.votes);
+                if (votedEntries.length === 0) {
+                    votedEntriesHTML = `<p class="text-xs text-zinc-500 italic">Nenhum voto registrado ainda.</p>`;
+                } else {
+                    votedEntriesHTML = votedEntries.map(([uid, voteVal]) => {
+                        const uObj = users.find(u => u.id === uid);
+                        const uName = uObj ? uObj.name : 'Estudante';
+                        const badgeColor = voteVal === 'SIM' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' :
+                                           voteVal === 'NÃO' ? 'bg-rose-950 text-rose-400 border-rose-800' : 'bg-amber-950 text-amber-400 border-amber-800';
+                        return `
+                            <div class="flex items-center justify-between p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs">
+                                <span class="font-medium text-white">${uName}</span>
+                                <span class="px-2 py-0.5 rounded-md font-bold border ${badgeColor}">${voteVal}</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                container.innerHTML = `
+                    <div class="p-6 rounded-2xl bg-zinc-950 border border-red-900/40 space-y-6">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold text-red-500 uppercase tracking-wider">[${activeVoting.projectCategory}] Em Pauta</span>
+                            <h4 class="text-xl font-black text-white">${activeVoting.projectTitle}</h4>
+                            <p class="text-xs text-zinc-400">Autor da Proposta: <strong>${activeVoting.author}</strong></p>
+                            <p class="text-sm text-zinc-300 leading-relaxed bg-zinc-900/80 p-4 rounded-xl border border-zinc-800">${activeVoting.projectDesc}</p>
+                        </div>
+
+                        <!-- BOTÕES DE VOTO -->
+                        <div class="space-y-3 pt-2">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400 block">Seu Voto Oficial:</span>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button onclick="votarProjeto('SIM')" class="py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 border ${
+                                    userVoto === 'SIM' ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-600/30' : 'bg-zinc-900 hover:bg-emerald-950/40 text-emerald-400 border-zinc-800'
+                                }">
+                                    <i data-lucide="check" class="w-4 h-4"></i> SIM
+                                </button>
+                                <button onclick="votarProjeto('NÃO')" class="py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 border ${
+                                    userVoto === 'NÃO' ? 'bg-rose-600 text-white border-rose-500 shadow-lg shadow-rose-600/30' : 'bg-zinc-900 hover:bg-rose-950/40 text-rose-400 border-zinc-800'
+                                }">
+                                    <i data-lucide="x" class="w-4 h-4"></i> NÃO
+                                </button>
+                                <button onclick="votarProjeto('ABESTENÇÃO')" class="py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 border ${
+                                    userVoto === 'ABESTENÇÃO' ? 'bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-600/30' : 'bg-zinc-900 hover:bg-amber-950/40 text-amber-400 border-zinc-800'
+                                }">
+                                    <i data-lucide="minus-circle" class="w-4 h-4"></i> ABSTENÇÃO
+                                </button>
+                            </div>
+                            ${userVoto ? `<p class="text-xs text-emerald-400 font-medium text-center pt-1">✓ Voto registrado com sucesso: <strong>${userVoto}</strong></p>` : ''}
+                        </div>
+
+                        <!-- PLACAR EM TEMPO REAL -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-zinc-800">
+                            <div class="p-3 bg-zinc-900 rounded-xl border border-zinc-800 text-center">
+                                <span class="text-[10px] text-zinc-400 uppercase font-bold">Total Votos</span>
+                                <h5 class="text-lg font-black text-white">${totalVotos}</h5>
+                            </div>
+                            <div class="p-3 bg-emerald-950/30 rounded-xl border border-emerald-900/40 text-center">
+                                <span class="text-[10px] text-emerald-400 uppercase font-bold">Sim</span>
+                                <h5 class="text-lg font-black text-emerald-400">${totalSim}</h5>
+                            </div>
+                            <div class="p-3 bg-rose-950/30 rounded-xl border border-rose-900/40 text-center">
+                                <span class="text-[10px] text-rose-400 uppercase font-bold">Não</span>
+                                <h5 class="text-lg font-black text-rose-400">${totalNao}</h5>
+                            </div>
+                            <div class="p-3 bg-amber-950/30 rounded-xl border border-amber-900/40 text-center">
+                                <span class="text-[10px] text-amber-400 uppercase font-bold">Abstenção</span>
+                                <h5 class="text-lg font-black text-amber-400">${totalAbst}</h5>
+                            </div>
+                        </div>
+
+                        <!-- LISTA DE QUEM VOTOU -->
+                        <div class="space-y-2 pt-2">
+                            <h5 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Gremistas que já votaram (${totalVotos}):</h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                                ${votedEntriesHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Renderizar histórico de votações encerradas e faltas
+            if (votingHistory.length === 0) {
+                historyContainer.innerHTML = `<p class="text-xs text-zinc-500 py-3 text-center">Nenhuma votação encerrada registrada no histórico.</p>`;
+            } else {
+                historyContainer.innerHTML = votingHistory.map(item => {
+                    const simC = Object.values(item.votes).filter(v => v === 'SIM').length;
+                    const naoC = Object.values(item.votes).filter(v => v === 'NÃO').length;
+                    const abstC = Object.values(item.votes).filter(v => v === 'ABESTENÇÃO').length;
+                    
+                    const faltasHTML = item.faltas && item.faltas.length > 0 ? 
+                        item.faltas.map(f => `<span class="px-2 py-0.5 bg-rose-950/60 text-rose-400 border border-rose-900 rounded text-[11px] font-medium">${f.name}</span>`).join('') :
+                        `<span class="text-xs text-zinc-500 italic">Nenhuma falta (todos votaram).</span>`;
+
+                    const detailedVotesHTML = Object.entries(item.votes).map(([uid, v]) => {
+                        const uObj = users.find(u => u.id === uid);
+                        return `<div class="text-xs text-zinc-300 flex justify-between border-b border-zinc-900 py-1"><span>${uObj ? uObj.name : 'Estudante'}</span><strong class="text-red-400">${v}</strong></div>`;
+                    }).join('');
+
+                    return `
+                        <div class="p-5 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <span class="text-xs font-bold text-red-500">[${item.projectCategory}] Votação Encerrada</span>
+                                    <h4 class="font-bold text-white text-base">${item.projectTitle}</h4>
+                                </div>
+                                <div class="flex gap-2 text-xs font-bold">
+                                    <span class="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800">Sim: ${simC}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-rose-950 text-rose-400 border border-rose-800">Não: ${naoC}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-400 border border-amber-800">Abst: ${abstC}</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-zinc-400">${item.projectDesc}</p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-zinc-900">
+                                <div>
+                                    <h5 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Votos Computados:</h5>
+                                    <div class="max-h-32 overflow-y-auto space-y-1 pr-1 bg-zinc-900 p-3 rounded-xl border border-zinc-800">
+                                        ${detailedVotesHTML || '<span class="text-xs text-zinc-500">Nenhum voto.</span>'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h5 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">Faltas (Não votaram):</h5>
+                                    <div class="flex flex-wrap gap-1.5 p-3 rounded-xl bg-zinc-900 border border-zinc-800 max-h-32 overflow-y-auto">
+                                        ${faltasHTML}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderAssignedProjects() {
+            const container = document.getElementById('assigned-projects-list');
+            if (!container) return;
+            const assigned = projects.filter(p => p.assignedToId === currentUser.id);
+
+            if (assigned.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 bg-zinc-900 rounded-2xl border border-zinc-800 p-8 text-center text-zinc-500 text-sm">
+                        Nenhum projeto atribuído diretamente a você no momento.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = assigned.map(p => `
+                <div class="bg-zinc-900 rounded-2xl border border-zinc-800 p-5 shadow-sm space-y-3">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-red-500">${p.category}</span>
+                            <h4 class="font-bold text-white text-base">${p.title}</h4>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold ${
+                            p.status === 'Concluído' ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800' :
+                            p.status === 'Em Andamento' ? 'bg-amber-950/60 text-amber-400 border border-amber-800' : 'bg-zinc-800 text-zinc-300'
+                        }">${p.status}</span>
+                    </div>
+
+                    <p class="text-xs text-zinc-400 leading-relaxed">${p.description}</p>
+
+                    <div class="pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
+                        <span>Prazo: ${p.targetDate ? p.targetDate : 'Sem prazo'}</span>
+                        <select onchange="updateProjectStatus('${p.id}', this.value)" class="text-xs font-semibold px-2 py-1 rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-200 focus:outline-none">
+                            <option value="Pendente" ${p.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                            <option value="Em Andamento" ${p.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                            <option value="Concluído" ${p.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.updateProjectStatus = function(projId, newStatus) {
+            const p = projects.find(item => item.id === projId);
+            if (p) {
+                p.status = newStatus;
+                persistAndRender();
+                showToast(`Status alterado para: ${newStatus}`);
+            }
+        }
+
+        function renderAllProjects() {
+            const container = document.getElementById('all-projects-list');
+            if (!container) return;
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 bg-zinc-900 rounded-2xl border border-zinc-800 p-8 text-center text-zinc-500 text-sm">
+                        Nenhum projeto registrado até o momento.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = projects.map(p => `
+                <div class="bg-zinc-900 rounded-2xl border border-zinc-800 p-5 shadow-sm space-y-3">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-red-500">[${p.category}]</span>
+                            <h4 class="font-bold text-white text-base">${p.title}</h4>
+                            <span class="text-[11px] text-zinc-500">Autor: <strong>${p.authorName}</strong></span>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold ${
+                            p.status === 'Concluído' ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800' :
+                            p.status === 'Em Andamento' ? 'bg-amber-950/60 text-amber-400 border border-amber-800' : 'bg-zinc-800 text-zinc-300'
+                        }">${p.status}</span>
+                    </div>
+                    <p class="text-xs text-zinc-400 leading-relaxed">${p.description}</p>
+                </div>
+            `).join('');
+        }
+
+        window.filterCalendar = function(filterType, btn) {
+            activeCalendarFilter = filterType;
+            document.querySelectorAll('.calendar-filter-btn').forEach(b => {
+                b.className = 'calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-300 hover:bg-zinc-700';
+            });
+            btn.className = 'calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-950/60 text-red-400 border border-red-800';
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('events-timeline');
+            if (!container) return;
+
+            let filtered = events;
+            if (activeCalendarFilter !== 'all') {
+                filtered = events.filter(e => e.type === activeCalendarFilter);
+            }
+
+            filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-zinc-500 text-sm">Nenhum evento registrado nesta categoria.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(e => `
+                <div class="flex items-start gap-4 p-4 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-red-900/40 transition">
+                    <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-zinc-900 border border-zinc-800 min-w-[65px] text-center">
+                        <span class="text-xs uppercase font-bold text-red-500">${getMonthAbbr(e.date)}</span>
+                        <span class="text-xl font-black text-white">${getDayNumber(e.date)}</span>
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <h4 class="font-bold text-white text-sm">${e.title}</h4>
+                        <p class="text-xs text-zinc-400">${e.desc || 'Sem detalhes fornecidos.'}</p>
+                    </div>
+                    ${currentUser && currentUser.roleType === 'ADM' ? `
+                        <button onclick="deleteEvent('${e.id}')" class="text-zinc-500 hover:text-red-500 p-1" title="Excluir data">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.deleteEvent = function(id) {
+            events = events.filter(e => e.id !== id);
+            persistAndRender();
+            showToast('Evento removido.');
+        }
+
+        function renderComissaoList() {
+            const container = document.getElementById('lista-membros-comissao');
+            if (!container) return;
+            const comissaoUsers = users.filter(u => u.roleType === 'COMISSAO');
+
+            if (comissaoUsers.length === 0) {
+                container.innerHTML = `<p class="col-span-2 text-zinc-500 text-sm py-4">Nenhum membro na comissão no momento.</p>`;
+                return;
+            }
+
+            container.innerHTML = comissaoUsers.map(u => `
+                <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-950 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-white text-sm block">${u.name}</span>
+                        <span class="text-xs text-zinc-400">Indicado(a) por: <strong class="text-red-400">${u.indicatedBy || 'N/A'}</strong></span>
+                    </div>
+                    <span class="px-2 py-1 rounded-md text-[10px] font-bold bg-red-950/60 text-red-400 border border-red-800/60 uppercase">Comissão</span>
+                </div>
+            `).join('');
+        }
+
+        function renderDirecaoPanel() {
+            const container = document.getElementById('direcao-pedidos-list');
+            if (!container) return;
+
+            if (pedidosDirecao.length === 0) {
+                container.innerHTML = `<p class="text-zinc-500 text-sm py-4 text-center">Nenhum pedido enviado ainda.</p>`;
+                return;
+            }
+
+            container.innerHTML = pedidosDirecao.map(p => `
+                <div class="p-3.5 rounded-xl border border-zinc-800 bg-zinc-950 space-y-1 text-xs">
+                    <div class="flex justify-between font-bold text-white">
+                        <span>${p.titulo}</span>
+                        <span class="text-red-500">${p.destinatario}</span>
+                    </div>
+                    <p class="text-zinc-400">${p.descricao}</p>
+                    <span class="text-[10px] text-zinc-500 block pt-1">Status: ${p.status || 'Enviado ao ADM'}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminPanel() {
+            const pendingIndica = indicacoesComissao.filter(i => i.status === 'PENDENTE');
+            const pendingProj = projects.filter(p => p.status === 'Pendente');
+            const pendingDirecao = pedidosDirecao.filter(d => d.status !== 'Atendido');
+
+            document.getElementById('count-pending-indica').innerText = pendingIndica.length;
+            document.getElementById('count-pending-direcao').innerText = pendingDirecao.length;
+            document.getElementById('count-pending-total').innerText = pendingIndica.length + pendingProj.length + pendingDirecao.length;
+            
+            document.getElementById('count-total-users').innerText = users.length;
+
+            document.getElementById('badge-count-indica').innerText = pendingIndica.length;
+            document.getElementById('badge-count-proj').innerText = pendingProj.length;
+            document.getElementById('badge-count-direcao').innerText = pendingDirecao.length;
+
+            // Preencher select de projetos para pauta
+            const selectPauta = document.getElementById('select-project-pauta');
+            if (selectPauta) {
+                selectPauta.innerHTML = `<option value="">Selecione um projeto para colocar em pauta...</option>` + 
+                    projects.map(p => `<option value="${p.id}">${p.title} (${p.category} - Autor: ${p.authorName})</option>`).join('');
+            }
+
+            // Status da votação ativa no ADM
+            const admPautaContent = document.getElementById('adm-pauta-content');
+            if (admPautaContent) {
+                if (!activeVoting || activeVoting.status === 'CLOSED') {
+                    admPautaContent.innerHTML = `<p class="text-zinc-500 text-xs italic">Nenhum projeto em votação eletrônica no momento.</p>`;
+                } else {
+                    const totalV = Object.keys(activeVoting.votes).length;
+                    admPautaContent.innerHTML = `
+                        <div class="space-y-2">
+                            <span class="font-bold text-white text-sm block">Em Pauta: ${activeVoting.projectTitle}</span>
+                            <p class="text-xs text-zinc-400">Votos computados até o momento: <strong class="text-emerald-400">${totalV}</strong></p>
+                        </div>
+                    `;
+                }
+            }
+
+            const containerIndica = document.getElementById('adm-subtab-indicacoes');
+            if (pendingIndica.length === 0) {
+                containerIndica.innerHTML = `<p class="text-zinc-500 text-xs py-4 text-center">Sem indicações pendentes de aprovação.</p>`;
+            } else {
+                containerIndica.innerHTML = pendingIndica.map(i => `
+                    <div class="p-4 rounded-xl border border-red-900/40 bg-zinc-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-sm">${i.nome}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-400 border border-red-800">${i.sala} - ${i.periodo}</span>
+                            </div>
+                            <p class="text-xs text-zinc-400"><strong>Motivo:</strong> ${i.motivo}</p>
+                            <span class="text-[11px] text-zinc-500">Indicado por: <strong>${i.indicadoPor}</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="approveIndication('${i.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> Autorizar
+                            </button>
+                            <button onclick="rejectIndication('${i.id}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i> Recusar
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const containerProj = document.getElementById('adm-subtab-projetos');
+            if (projects.length === 0) {
+                containerProj.innerHTML = `<p class="text-zinc-500 text-xs py-4 text-center">Nenhum projeto submetido.</p>`;
+            } else {
+                containerProj.innerHTML = projects.map(p => `
+                    <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-950 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-red-500">[${p.category}]</span>
+                                <h4 class="font-bold text-white">${p.title}</h4>
+                                <span class="text-xs text-zinc-500">Enviado por: <strong>${p.authorName}</strong></span>
+                            </div>
+                            <div>
+                                <select onchange="assignProject('${p.id}', this.value)" class="text-xs px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 font-medium text-zinc-200">
+                                    <option value="">Atribuir a Responsável...</option>
+                                    ${users.map(u => `
+                                        <option value="${u.id}" ${p.assignedToId === u.id ? 'selected' : ''}>${u.name} (${u.roleType})</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        <p class="text-xs text-zinc-400">${p.description}</p>
+                    </div>
+                `).join('');
+            }
+
+            const containerDirecao = document.getElementById('adm-subtab-direcao');
+            if (pedidosDirecao.length === 0) {
+                containerDirecao.innerHTML = `<p class="text-zinc-500 text-xs py-4 text-center">Nenhum pedido da Direção Escolar.</p>`;
+            } else {
+                containerDirecao.innerHTML = pedidosDirecao.map(d => `
+                    <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-950 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-white text-sm">${d.titulo}</h4>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-400 border border-red-800">${d.destinatario}</span>
+                        </div>
+                        <p class="text-xs text-zinc-400">${d.descricao}</p>
+                    </div>
+                `).join('');
+            }
+
+            const selectTarget = document.getElementById('msg-target');
+            let opts = `
+                <option value="ALL">Todos os Usuários</option>
+                <option value="GREMISTA">Todos os Gremistas</option>
+                <option value="COMISSAO">Toda a Comissão</option>
+                <option value="DIRECAO">Direção Escolar</option>
+            `;
+            users.forEach(u => {
+                opts += `<option value="${u.id}">Individual: ${u.name} (${u.roleType})</option>`;
+            });
+            selectTarget.innerHTML = opts;
+
+            const usersContainer = document.getElementById('users-list-container');
+            usersContainer.innerHTML = users.map(u => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950 text-xs">
+                    <div>
+                        <span class="font-bold text-white block">${u.name} (${u.roleType})</span>
+                        <span class="text-zinc-500">Login: <span class="font-mono text-red-400">${u.username}</span> | Senha: <span class="font-mono text-zinc-300">${u.password}</span></span>
+                    </div>
+                    ${u.username.toLowerCase() !== 'miguel' ? `
+                        <button onclick="deleteUser('${u.id}')" class="text-zinc-500 hover:text-red-500 p-1" title="Excluir Usuário">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        window.switchAdmSubtab = function(tab) {
+            activeAdmSubtab = tab;
+            document.getElementById('adm-subtab-indicacoes').classList.add('hidden');
+            document.getElementById('adm-subtab-projetos').classList.add('hidden');
+            document.getElementById('adm-subtab-direcao').classList.add('hidden');
+
+            document.getElementById('subtab-btn-indicacoes').className = 'pb-2 border-b-2 border-transparent hover:text-zinc-200';
+            document.getElementById('subtab-btn-projetos').className = 'pb-2 border-b-2 border-transparent hover:text-zinc-200';
+            document.getElementById('subtab-btn-direcao').className = 'pb-2 border-b-2 border-transparent hover:text-zinc-200';
+
+            if (tab === 'indicacoes') {
+                document.getElementById('adm-subtab-indicacoes').classList.remove('hidden');
+                document.getElementById('subtab-btn-indicacoes').className = 'pb-2 border-b-2 border-red-600 text-red-500 font-bold';
+            } else if (tab === 'projetos') {
+                document.getElementById('adm-subtab-projetos').classList.remove('hidden');
+                document.getElementById('subtab-btn-projetos').className = 'pb-2 border-b-2 border-red-600 text-red-500 font-bold';
+            } else if (tab === 'direcao') {
+                document.getElementById('adm-subtab-direcao').classList.remove('hidden');
+                document.getElementById('subtab-btn-direcao').className = 'pb-2 border-b-2 border-red-600 text-red-500 font-bold';
+            }
+        }
+
+        window.approveIndication = function(id) {
+            const ind = indicacoesComissao.find(i => i.id === id);
+            if (ind) {
+                ind.status = 'APROVADO';
+
+                const loginClean = ind.nome.toLowerCase().replace(/\s+/g, '');
+                const newUser = {
+                    id: 'u_' + Date.now(),
+                    name: ind.nome,
+                    username: loginClean,
+                    password: '123',
+                    roleType: 'COMISSAO',
+                    indicatedBy: ind.indicadoPor
+                };
+                
+                users.push(newUser);
+                persistAndRender();
+                showToast(`Indicação autorizada! Usuário "${loginClean}" ativado.`);
+            }
+        }
+
+        window.rejectIndication = function(id) {
+            indicacoesComissao = indicacoesComissao.filter(i => i.id !== id);
+            persistAndRender();
+            showToast('Indicação recusada.');
+        }
+
+        window.toggleCoordenadorSelect = function() {
+            const roleType = document.getElementById('new-user-role-type').value;
+            const box = document.getElementById('box-select-coordenador');
+            const selectCoord = document.getElementById('new-user-coordinator');
+
+            if (roleType === 'COMISSAO') {
+                box.classList.remove('hidden');
+                const recommenders = users.filter(u => u.roleType === 'COORDENADOR' || u.roleType === 'GREMISTA' || u.roleType === 'ADM' || u.roleType === 'DIRECAO');
+                selectCoord.innerHTML = recommenders.map(c => `<option value="${c.name}">${c.name} (${c.roleType})</option>`).join('');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        // CADASTRAR USUÁRIO
+        document.getElementById('form-add-user').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const roleType = document.getElementById('new-user-role-type').value;
+            const name = document.getElementById('new-user-name').value.trim();
+            const username = document.getElementById('new-user-login').value.trim();
+            const password = document.getElementById('new-user-password').value.trim();
+
+            if (!username || !password || !name) {
+                showToast('Preencha todos os campos do usuário!', false);
+                return;
+            }
+
+            const normalizedUserIn = username.toLowerCase();
+
+            if (users.some(u => String(u.username).trim().toLowerCase() === normalizedUserIn)) {
+                showToast('Este login de usuário já existe!', false);
+                return;
+            }
+
+            const userId = 'u_' + Date.now();
+            const newUser = {
+                id: userId,
+                name,
+                username,
+                password,
+                roleType,
+                indicatedBy: roleType === 'COMISSAO' ? (document.getElementById('new-user-coordinator')?.value || null) : null
+            };
+
+            users.push(newUser);
+            persistAndRender();
+            
+            document.getElementById('form-add-user').reset();
+            showToast(`Usuário "${username}" cadastrado e salvo com sucesso!`);
+        });
+
+        // PUBLICAR EVENTO
+        document.getElementById('form-add-event').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('event-title').value.trim();
+            const date = document.getElementById('event-date').value;
+            const type = document.getElementById('event-type').value;
+            const desc = document.getElementById('event-desc').value.trim();
+
+            if (!title || !date) {
+                showToast('Preencha o título e a data!', false);
+                return;
+            }
+
+            const eventId = 'e_' + Date.now();
+            const newEvent = { id: eventId, title, date, type, desc };
+
+            events.push(newEvent);
+            persistAndRender();
+
+            document.getElementById('form-add-event').reset();
+            showToast('Evento adicionado e salvo ao Calendário 2027!');
+        });
+
+        // SUBMETER PROJETO
+        document.getElementById('form-submit-project').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const projId = 'p_' + Date.now();
+            const newProj = {
+                id: projId,
+                title: document.getElementById('project-title').value.trim(),
+                category: document.getElementById('project-category').value,
+                targetDate: document.getElementById('project-target-date').value,
+                description: document.getElementById('project-description').value.trim(),
+                authorName: currentUser.name,
+                assignedToId: null,
+                status: 'Pendente'
+            };
+
+            projects.push(newProj);
+            persistAndRender();
+
+            document.getElementById('form-submit-project').reset();
+            showToast('Projeto submetido com sucesso!');
+        });
+
+        // ENVIAR MENSAGEM / BROADCAST
+        document.getElementById('form-send-msg').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const msgId = 'm_' + Date.now();
+            const newMsg = {
+                id: msgId,
+                target: document.getElementById('msg-target').value,
+                title: document.getElementById('msg-title').value.trim(),
+                body: document.getElementById('msg-body').value.trim(),
+                date: new Date().toLocaleDateString('pt-BR'),
+                readBy: []
+            };
+
+            systemMessages.push(newMsg);
+            persistAndRender();
+
+            document.getElementById('form-send-msg').reset();
+            showToast('Aviso transmitido!');
+        });
+
+        // ENVIAR PEDIDO DA DIREÇÃO
+        document.getElementById('form-pedidos-direcao').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const reqId = 'req_' + Date.now();
+            const newReq = {
+                id: reqId,
+                titulo: document.getElementById('pedido-titulo').value.trim(),
+                destinatario: document.getElementById('pedido-destinatario').value,
+                descricao: document.getElementById('pedido-descricao').value.trim(),
+                status: 'Pendente'
+            };
+
+            pedidosDirecao.push(newReq);
+            persistAndRender();
+
+            document.getElementById('form-pedidos-direcao').reset();
+            showToast('Solicitação oficial enviada ao ADM!');
+        });
+
+        // INDICAR COMISSÃO
+        document.getElementById('form-indicar-comissao').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const indId = 'ind_' + Date.now();
+            const newInd = {
+                id: indId,
+                nome: document.getElementById('nom-comissao').value.trim(),
+                sala: document.getElementById('sala-comissao').value.trim(),
+                periodo: document.getElementById('periodo-comissao').value,
+                motivo: document.getElementById('motivo-comissao').value.trim(),
+                indicadoPor: currentUser.name,
+                status: 'PENDENTE'
+            };
+
+            indicacoesComissao.push(newInd);
+            persistAndRender();
+
+            document.getElementById('form-indicar-comissao').reset();
+            showToast('Indicação enviada ao ADM para aprovação!');
+        });
+
+        // ENVIO DE TRABALHO
+        document.getElementById('form-envio-trabalho').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const trabId = 'trab_' + Date.now();
+            const newTrab = {
+                id: trabId,
+                titulo: document.getElementById('trabalho-titulo').value.trim(),
+                link: document.getElementById('trabalho-link').value.trim(),
+                obs: document.getElementById('trabalho-obs').value.trim(),
+                aluno: currentUser.name
+            };
+
+            trabalhosEnviados.push(newTrab);
+            persistAndRender();
+
+            document.getElementById('form-envio-trabalho').reset();
+            showToast('Comprovante/Trabalho enviado ao ADM!');
+        });
+
+        window.assignProject = function(projId, userId) {
+            const p = projects.find(item => item.id === projId);
+            if (p) {
+                p.assignedToId = userId;
+                persistAndRender();
+                showToast('Projeto atribuído com sucesso!');
+            }
+        }
+
+        window.deleteUser = function(id) {
+            users = users.filter(u => u.id !== id);
+            persistAndRender();
+            showToast('Usuário removido.');
+        }
+
+        function getMonthAbbr(dateStr) {
+            if (!dateStr) return '';
+            const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            return months[parseInt(dateStr.split('-')[1]) - 1] || '';
+        }
+
+        function getDayNumber(dateStr) {
+            return dateStr ? dateStr.split('-')[2] : '';
+        }
+
+        function showToast(msg, success = true) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = msg;
+            toastIcon.setAttribute('data-lucide', success ? 'check-circle' : 'alert-circle');
+            toastIcon.className = `w-5 h-5 ${success ? 'text-red-500' : 'text-zinc-400'}`;
+            lucide.createIcons();
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        window.onload = () => {
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
